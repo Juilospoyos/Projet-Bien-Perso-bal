@@ -27,22 +27,31 @@ app.add_middleware(
 # -----------------------------
 # Model loading (once at startup)
 # -----------------------------
-MODEL_DIR = Path(__file__).resolve().parent / "model"
 
-_tokenizer: Optional[CamembertTokenizer] = None
+# Remplace MODEL_DIR par le chemin local vers ton modèle
+MODEL_DIR = Path("./model")
+
+_tokenizer: Optional[CamembertTokenizerFast] = None
 _model: Optional[CamembertForSequenceClassification] = None
 _device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 
 def load_artifacts():
     global _tokenizer, _model
+
     if _tokenizer is None or _model is None:
+        # Vérifie que le dossier existe
         if not MODEL_DIR.exists():
             raise RuntimeError(f"Model directory not found: {MODEL_DIR}")
-        _tokenizer = CamembertTokenizerFast.from_pretrained(str(MODEL_DIR))
-        _model = CamembertForSequenceClassification.from_pretrained(str(MODEL_DIR))
+
+        # Charger le tokenizer et le modèle depuis le dossier local
+        _tokenizer = CamembertTokenizerFast.from_pretrained(MODEL_DIR)
+        _model = CamembertForSequenceClassification.from_pretrained(MODEL_DIR)
+
+        # Préparer le modèle pour l'inférence
         _model.eval()
         _model.to(_device)
+
 
 
 @app.on_event("startup")
