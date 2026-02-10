@@ -8,7 +8,7 @@ import torch
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
-from transformers import CamembertForSequenceClassification, CamembertTokenizer
+from transformers import CamembertForSequenceClassification, CamembertTokenizerFast
 
 # -----------------------------
 # App and CORS configuration
@@ -39,7 +39,7 @@ def load_artifacts():
     if _tokenizer is None or _model is None:
         if not MODEL_DIR.exists():
             raise RuntimeError(f"Model directory not found: {MODEL_DIR}")
-        _tokenizer = CamembertTokenizer.from_pretrained(str(MODEL_DIR))
+        _tokenizer = CamembertTokenizerFast.from_pretrained(str(MODEL_DIR))
         _model = CamembertForSequenceClassification.from_pretrained(str(MODEL_DIR))
         _model.eval()
         _model.to(_device)
